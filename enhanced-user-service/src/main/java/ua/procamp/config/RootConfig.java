@@ -1,5 +1,7 @@
 package ua.procamp.config;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -10,6 +12,13 @@ import org.springframework.transaction.PlatformTransactionManager;
  * todo: 1. Configure {@link PlatformTransactionManager} bean with name "transactionManager"
  * todo: 2. Enable transaction management
  */
+@Configuration
 public class RootConfig {
+
+	@Bean
+	public PlatformTransactionManager transactionManager(){
+
+	}
+
 }
 

@@ -1,6 +1,11 @@
 package ua.procamp.dao;
 
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import ua.procamp.model.jpa.User;
 
 /**
  * This interface represents a data access object (DAO) for {@link User}.
@@ -12,6 +17,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * todo: 3. Create method that finds optional user by email fetching its address and roles using {@link org.springframework.data.jpa.repository.Query}
  * todo: 4. Add custom User repository interface
  */
-public interface UserRepository extends JpaRepository {
+@Repository
+public interface UserRepository extends JpaRepository<User,Long> {
+
+	List<User> findByAddressCity(String cityName);
+
+	@Query("SELECT u FROM USER u WHERE u.email = ?1")
+	Optional<User> findByEmail(String email);
 
 }

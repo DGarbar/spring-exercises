@@ -1,13 +1,15 @@
 package ua.procamp.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.procamp.dao.UserDao;
 import ua.procamp.model.jpa.Role;
 import ua.procamp.model.jpa.RoleType;
 import ua.procamp.model.jpa.User;
-
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * This class proovides {@link User} related service logic.
@@ -18,22 +20,42 @@ import static java.util.stream.Collectors.toList;
  * todo: 4. Configure {@link UserService#getAll()} as read-only method
  * todo: 4. Configure {@link UserService#getAllAdmins()} as read-only method
  */
+@Service
+@Transactional
 public class UserService {
-    private UserDao userDao;
 
-    public void save(User user) {
-        throw new UnsupportedOperationException("Keep calm and implement the method");
-    }
+	private UserDao userDao;
 
-    public List<User> getAll() {
-        throw new UnsupportedOperationException("Keep calm and implement the method");
-    }
+	public UserService(UserDao userDao) {
+		this.userDao = userDao;
+	}
 
-    public List<User> getAllAdmins() {
-        throw new UnsupportedOperationException("Keep calm and implement the method");
-    }
+	public void save(User user) {
+		userDao.save(user);
+	}
 
-    public void addRole(Long userId, RoleType roleType) {
-        throw new UnsupportedOperationException("Keep calm and implement the method");
-    }
+	@Transactional(readOnly = true)
+	public List<User> getAll() {
+		return userDao.findAll();
+	}
+
+	@Transactional(readOnly = true)
+	public List<User> getAllAdmins() {
+		return userDao.findAll()
+			.stream()
+			.filter(user -> isAdmin(user.getRoles()))
+			.collect(Collectors.toList());
+	}
+
+	private boolean isAdmin(Set<Role> roles) {
+		return roles.stream()
+			.anyMatch(role -> role.getRoleType().equals(RoleType.ADMIN));
+	}
+
+	public void addRole(Long userId, RoleType roleType) {
+		Role role = new Role();
+		role.setRoleType(roleType);
+		Optional.ofNullable(userDao.findById(userId))
+			.ifPresent(user -> user.addRole(role));
+	}
 }
